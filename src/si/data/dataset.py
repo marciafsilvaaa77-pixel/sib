@@ -125,6 +125,60 @@ class Dataset:
             "var": self.get_variance()
         }
         return pd.DataFrame.from_dict(data, orient="index", columns=self.features)
+    
+    def dropna(self):
+        """
+        Removes all samples that contain at least one NaN value.
+
+        Returns
+        -------
+        self (modified Dataset)
+        """
+        mask = ~np.isnan(self.X).any(axis=1)
+        self.X = self.X[mask]
+        if self.has_label():
+            self.y = self.y[mask]
+        return self  
+    
+    def fillna(self, value):
+        """
+        Replaces all NaN values.
+
+        Parameters
+        ----------
+        value: float or "mean" or "median"
+            The value to use (or the mean/median of each feature)
+
+        Returns
+        -------
+        self (modified Dataset)
+        """
+        if value == "mean":
+            fill = np.nanmean(self.X, axis=0)
+        elif value == "median":
+            fill = np.nanmedian(self.X, axis=0)
+        else:
+            fill = value
+        self.X = np.where(np.isnan(self.X), fill, self.X)
+        return self
+    
+    def remove_by_index(self, index: int):
+        """
+        Removes a sample by its index.
+
+        Parameters
+        ----------
+        index: int
+            The index of the sample to remove
+
+        Returns
+        -------
+        self (modified Dataset)
+        """
+        self.X = np.delete(self.X, index, axis=0)
+        if self.has_label():
+            self.y = np.delete(self.y, index, axis=0)
+        return self
 
     @classmethod
     def from_dataframe(cls, df: pd.DataFrame, label: str = None):
