@@ -61,3 +61,4 @@ def write_csv(filename: str, dataset: Dataset, sep: str = ",", features: bool = 
         df[dataset.label] = dataset.y
 
     df.to_csv(filename, sep=sep, header=features, index=False)
+    
